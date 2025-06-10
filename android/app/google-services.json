@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "204991613682-6c6agq9gmq2nt66ktsmr11buuchb70nv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.shoes_store_app",
+            "certificate_hash": "882da27d3425e93f880c7355248a5772fa0c2f65"
+          }
+        },
+        {
           "client_id": "204991613682-eeovkmosgai6otvp23t9l8d9mm5io7ls.apps.googleusercontent.com",
           "client_type": 3
         }

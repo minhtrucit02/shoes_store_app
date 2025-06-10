@@ -1,11 +1,10 @@
-
 class ImageProduct {
-  ImageProduct({required this.imagePath});
+  ImageProduct({required this.url});
 
-  final String imagePath;
+  final String url;
 
   factory ImageProduct.fromJson(Map<String, dynamic> json) =>
-      ImageProduct(imagePath: json['imagePath']);
+      ImageProduct(url: json['url'] ?? '');
 
-  Map<String, dynamic> toJson() => {'imagePath': imagePath};
+  Map<String, dynamic> toJson() => {'url': url};
 }

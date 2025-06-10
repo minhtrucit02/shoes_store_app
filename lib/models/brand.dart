@@ -6,15 +6,15 @@ class Brand {
     required this.createdAt,
   });
   
-  final int id;
+  final String id;
   final String name;
   final String imagePath;
   final String createdAt;
 
   factory Brand.fromJson(Map<String,dynamic> json){
     return Brand(
-      id: json['id'] ?? 0,
-      name: json['brand'] ?? '',
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
       imagePath: json['imagePath'] ?? '',
       createdAt: json['createdAt'] ?? '',
     );
