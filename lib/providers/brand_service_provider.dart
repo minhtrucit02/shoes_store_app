@@ -18,3 +18,8 @@ final getBrandByIdProvider = FutureProvider.family<Brand?,String>((ref,id){
   final service = ref.watch(brandServiceProvider);
   return service.getBrandById(id);
 });
+
+final getBrandNameByIdProvider = FutureProvider.family<String?,String>((ref,brandId){
+  final service = ref.watch(brandServiceProvider);
+  return service.getBrandNameById(brandId);
+});

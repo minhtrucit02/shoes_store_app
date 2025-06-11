@@ -5,7 +5,7 @@ import 'package:shoes_store_app/models/product.dart';
 import 'package:shoes_store_app/services/product_service.dart';
 import 'package:http/http.dart' as http;
 
-class ProductServiceImpl implements ProductService{
+class ProductServiceImpl implements ProductService {
   final String baseUrl = 'https://shosestore-7c86e-default-rtdb.firebaseio.com';
   final database = FirebaseDatabase.instance;
 
@@ -16,7 +16,7 @@ class ProductServiceImpl implements ProductService{
   }
 
   @override
-  Future<void> deleteProduct(int productId) {
+  Future<void> deleteProduct(String productId) {
     // TODO: implement deleteProduct
     throw UnimplementedError();
   }
@@ -45,10 +45,25 @@ class ProductServiceImpl implements ProductService{
   }
 
   @override
-  Future<Product> getProductById(int productId) {
-    // TODO: implement getProductById
-    throw UnimplementedError();
-
+  Future<Product?> getProductById(String productId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/products/$productId.json'),
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data != null) {
+          return Product.fromRealtime(Map<String, dynamic>.from(data));
+        } else {
+          print('Không tìm thấy product với id: $productId');
+          return null;
+        }
+      } else {
+        throw Exception('Lỗi khi tải product: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Lỗi khi lấy product theo id: $e');
+      return null;
+    }
   }
-  
 }

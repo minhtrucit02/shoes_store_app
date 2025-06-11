@@ -52,6 +52,7 @@ class BrandServiceImpl implements BrandService{
       rethrow;
     }
   }
+
   @override
   Future<Brand?> getBrandById(String id) async {
     try {
@@ -70,6 +71,26 @@ class BrandServiceImpl implements BrandService{
       }
     } catch (e) {
       print('Lỗi khi lấy brand theo id: $e');
+      return null;
+    }
+  }
+
+  @override
+  Future<String?> getBrandNameById(String brandId) async {
+    try{
+      final response = await http.get(Uri.parse('$baseUrl/brands/$brandId.json'));
+      if(response.statusCode == 200){
+        final data = json.decode(response.body);
+        if(data != null && data['name'] != null){
+          return data['name'] as String;
+        } else{
+          print('Không tìm thấy tên thương hiệu cho ID: $brandId');
+          return null;        }
+      } else{
+        throw Exception('Lỗi khi tải brand name: ${response.statusCode}');
+      }
+    }catch(e){
+      print('Lỗi khi lấy brand name theo ID: $e');
       return null;
     }
   }

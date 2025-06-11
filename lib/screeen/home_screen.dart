@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoes_store_app/providers/home_provider.dart';
+import 'package:shoes_store_app/screeen/product_detail_screen.dart';
 import 'package:shoes_store_app/screeen/profile_screen.dart';
 import 'package:shoes_store_app/widgets/app_bar_card.dart';
 
@@ -94,7 +95,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8,),
-                  child: PopularProduct(),
+                  child: PopularProduct(onProductTap: (String productId) {
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=> ProductDetailScreen(productId)));
+                  },),
                 ),
               ),
 
