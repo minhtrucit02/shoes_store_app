@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoes_store_app/providers/home_provider.dart';
 import 'package:shoes_store_app/screeen/product_detail_screen.dart';
 import 'package:shoes_store_app/screeen/profile_screen.dart';
+import 'package:shoes_store_app/screeen/shopping_cart_screen.dart';
 import 'package:shoes_store_app/widgets/app_bar_card.dart';
 
 import '../widgets/brand_list.dart';
@@ -30,9 +31,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         break;
       case 2: // Shopping bag
       // TODO: Navigate to Cart screen
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Opening Shopping Bag...')),
-        );
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const ShoppingCartScreen()));
         break;
       case 3: // Notifications
       // TODO: Navigate to Notifications screen

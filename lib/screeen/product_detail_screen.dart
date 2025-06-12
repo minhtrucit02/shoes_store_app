@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shoes_store_app/models/cart_item.dart';
+import 'package:shoes_store_app/models/enum_cart_status.dart';
 import 'package:shoes_store_app/providers/brand_service_provider.dart';
+import 'package:shoes_store_app/providers/cart_item_provider.dart';
 import 'package:shoes_store_app/providers/product_provider.dart';
 import 'package:shoes_store_app/screeen/shopping_cart_screen.dart';
 
@@ -13,45 +16,6 @@ class ProductDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final productAsync = ref.watch(getProductByIdProvider(productId));
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Product Detail',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: IconButton(
-              onPressed: () {
-                final user = FirebaseAuth.instance.currentUser;
-                if (user == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Bạn cần đăng nhập để xem giỏ hàng"),
-                    ),
-                  );
-                  return;
-                }
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ShoppingCartScreen()),
-                );
-              },
-              icon: const Icon(
-                Icons.shopping_bag_outlined,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ],
-        centerTitle: true,
-      ),
       body: productAsync.when(
         data: (product) {
           final imagePaths =
@@ -167,11 +131,15 @@ class ProductDetailScreen extends ConsumerWidget {
                                 itemCount: imagePaths?.length,
                                 itemBuilder: (context, index) {
                                   final image = imagePaths?[index];
-                                  final isSelectedImage = selectedImageProduct == image;
                                   return GestureDetector(
-                                    onTap: (){
-                                      ref.read(selectedImageProductProvider.notifier).state = image;
-                                  },
+                                    onTap: () {
+                                      ref
+                                          .read(
+                                            selectedImageProductProvider
+                                                .notifier,
+                                          )
+                                          .state = image;
+                                    },
                                     child: Container(
                                       margin: const EdgeInsets.only(right: 12),
                                       decoration: BoxDecoration(
@@ -182,7 +150,9 @@ class ProductDetailScreen extends ConsumerWidget {
                                         ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(0.05),
+                                            color: Colors.black.withOpacity(
+                                              0.05,
+                                            ),
                                             blurRadius: 4,
                                             offset: const Offset(0, 2),
                                           ),
@@ -317,7 +287,63 @@ class ProductDetailScreen extends ConsumerWidget {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.blue,
                                     ),
-                                    onPressed: () {},
+                                    onPressed: () async {
+                                      final user =
+                                          FirebaseAuth.instance.currentUser;
+                                      if (user == null) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Bạn cần đăng nhập để thêm vào giỏ hàng',
+                                            ),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      if (selectedSize == null) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Vui lòng chọn size trước khi thêm vào giỏ hàng',
+                                            ),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      if (selectedImageProduct == null) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Vui lòng chọn ảnh sản phẩm')),
+                                        );
+                                        return;
+                                      }
+                                      final cartItem = CartItem(
+                                        id: DateTime.now().microsecondsSinceEpoch.toString(),
+                                        userId: user.uid,
+                                        productId: product.id,
+                                        productName: product.name,
+                                        productImage: 'assets/${brand.name}/${selectedImageProduct ?? imagePaths?.first}',
+                                        productPrice: product.price,
+                                        productSize: selectedSize,
+                                        quantity: 1,
+                                        status: CartStatus.unpaid,
+                                        buyDate: DateTime.now().toIso8601String(),
+                                      );
+                                      try{
+                                        await ref.read(addCartItemProvider(cartItem).future);
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Đã thêm thành công')),
+                                        );
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) => ShoppingCartScreen()));
+                                      }catch(e){
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Lỗi: ${e.toString()}')),
+                                        );
+                                      }
+                                    },
                                     child: const Text(
                                       "Add To Cart",
                                       style: TextStyle(
@@ -341,6 +367,45 @@ class ProductDetailScreen extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => const Center(child: Text("Không thể tải sản phẩm")),
+      ),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'Product Detail',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: IconButton(
+              onPressed: () {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Bạn cần đăng nhập để xem giỏ hàng"),
+                    ),
+                  );
+                  return;
+                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ShoppingCartScreen()),
+                );
+              },
+              icon: const Icon(
+                Icons.shopping_bag_outlined,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ],
+        centerTitle: true,
       ),
     );
   }
