@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/user_provider.dart';
-import 'login.dart';
+import 'login_screen.dart';
 
 class Signup extends ConsumerStatefulWidget {
   const Signup({super.key});
@@ -98,11 +98,12 @@ class _SignupState extends ConsumerState<Signup> {
                     final result = await userDao.signup(
                       _emailController.text.trim(),
                       _passwordController.text.trim(),
+                      _nameController.text.trim(),
                     );
                     if(result == null){
                       if(!context.mounted) return;
                       Navigator.pushAndRemoveUntil(context,
-                        MaterialPageRoute(builder: (context) => const Login()),
+                        MaterialPageRoute(builder: (context) => const LoginScreen()),
                             (Route<dynamic> route) => false,
                       );
                     } else {
@@ -159,7 +160,7 @@ class _SignupState extends ConsumerState<Signup> {
                   TextButton(
                     onPressed: () {
                       Navigator.push(context,
-                          MaterialPageRoute(builder: (context)=> const Login()));
+                          MaterialPageRoute(builder: (context)=> const LoginScreen()));
                     },
                     child: const Text(
                       "Sign In",

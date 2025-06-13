@@ -20,7 +20,7 @@ class SearchCard extends ConsumerWidget {
         },
         decoration: const InputDecoration(
           icon: Icon(Icons.search, color: Colors.grey),
-          hintText: 'Looking for shoes',
+          hintText: 'Tìm kiếm sản phẩm',
           border: InputBorder.none,
         ),
       ),

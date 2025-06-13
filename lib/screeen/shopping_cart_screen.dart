@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +12,7 @@ class ShoppingCartScreen extends ConsumerWidget {
     final cartItemAsync = ref.watch(getCartItemByUserIdProvider(user!.uid));
     final selectedItems = ref.watch(selectedCartProvider);
     final selectedNotifier = ref.read(selectedCartProvider.notifier);
+    final quantityState = ref.watch(cartQuantityControllerProvider);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -142,14 +142,20 @@ class ShoppingCartScreen extends ConsumerWidget {
                                   Row(
                                     children: [
                                       GestureDetector(
-                                        onTap: () {},
+                                        onTap: () {
+                                          if (item.quantity > 1) {
+                                            ref.read(cartQuantityControllerProvider.notifier).changeQuantity(
+                                              cartId: item.id,
+                                              newQuantity: item.quantity - 1,
+                                              userId: item.userId,
+                                            );
+                                          }
+                                        },
                                         child: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
                                             color: Colors.grey.shade100,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
+                                            borderRadius: BorderRadius.circular(8),
                                           ),
                                           child: const Icon(
                                             Icons.remove,
@@ -158,9 +164,7 @@ class ShoppingCartScreen extends ConsumerWidget {
                                         ),
                                       ),
                                       Container(
-                                        margin: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                        ),
+                                        margin: const EdgeInsets.symmetric(horizontal: 12),
                                         child: Text(
                                           '${item.quantity}',
                                           style: const TextStyle(
@@ -170,14 +174,18 @@ class ShoppingCartScreen extends ConsumerWidget {
                                         ),
                                       ),
                                       GestureDetector(
-                                        onTap: () {},
+                                        onTap: () {
+                                          ref.read(cartQuantityControllerProvider.notifier).changeQuantity(
+                                            cartId: item.id,
+                                            newQuantity: item.quantity + 1,
+                                            userId: item.userId,
+                                          );
+                                        },
                                         child: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
                                             color: Colors.grey.shade100,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
+                                            borderRadius: BorderRadius.circular(8),
                                           ),
                                           child: const Icon(
                                             Icons.add,
@@ -190,7 +198,7 @@ class ShoppingCartScreen extends ConsumerWidget {
                                 ],
                               ),
                             ),
-                            //TODO: size and delete
+                            //TODO: product size
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
@@ -201,9 +209,18 @@ class ShoppingCartScreen extends ConsumerWidget {
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
+
                                 const SizedBox(height: 8),
+
+                                //TODO: delete product
                                 IconButton(
-                                  onPressed: () {},
+                                  onPressed: ()async{
+                                    try{
+                                     await ref.read(deleteCartItemProvider(item.id).future);
+                                    }catch(e){
+                                      print(e);
+                                    }
+                                  },
                                   icon: const Icon(
                                     Icons.delete_outline,
                                     color: Colors.red,

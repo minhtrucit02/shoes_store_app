@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/user_provider.dart';
-import 'login.dart';
+import 'login_screen.dart';
 
 
 class Profile extends ConsumerWidget {
@@ -69,7 +69,7 @@ class Profile extends ConsumerWidget {
                     // TODO: Navigate to login screen
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Login()),
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
                     );
                   },
                   style: ElevatedButton.styleFrom(

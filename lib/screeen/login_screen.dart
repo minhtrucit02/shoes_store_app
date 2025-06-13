@@ -7,14 +7,14 @@ import 'package:shoes_store_app/screeen/sign_up_screen.dart';
 import '../providers/user_provider.dart';
 
 
-class Login extends ConsumerStatefulWidget {
-  const Login({super.key});
+class LoginScreen extends ConsumerStatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  ConsumerState<Login> createState() => _LoginState();
+  ConsumerState<LoginScreen> createState() => _LoginState();
 }
 
-class _LoginState extends ConsumerState<Login> {
+class _LoginState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
