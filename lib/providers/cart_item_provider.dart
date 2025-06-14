@@ -117,3 +117,4 @@ final deleteCartItemProvider = FutureProvider.family<void,String>((ref,cartItemI
   ref.invalidate(getCartItemByUserIdProvider);
 });
 
+final selectedCartItemProvider = StateProvider<List<CartItem>>((ref) => []);

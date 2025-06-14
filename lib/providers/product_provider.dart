@@ -19,4 +19,10 @@ final getProductByIdProvider = FutureProvider.family<Product?,String>((ref,Strin
   return service.getProductById(productId);
 });
 
+final getProductSizesProvider = FutureProvider.family<List<int>, (String productId, String imageKey)>((ref, params) {
+  final service = ref.watch(productServiceProvider);
+  final (productId, imageKey) = params;
+  return service.getProductSizes(productId, imageKey).first;
+});
+
 

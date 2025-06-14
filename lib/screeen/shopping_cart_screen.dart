@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoes_store_app/providers/cart_item_provider.dart';
+import 'package:shoes_store_app/screeen/payment_screen.dart';
 
 class ShoppingCartScreen extends ConsumerWidget {
   const ShoppingCartScreen({super.key});
@@ -12,7 +13,6 @@ class ShoppingCartScreen extends ConsumerWidget {
     final cartItemAsync = ref.watch(getCartItemByUserIdProvider(user!.uid));
     final selectedItems = ref.watch(selectedCartProvider);
     final selectedNotifier = ref.read(selectedCartProvider.notifier);
-    final quantityState = ref.watch(cartQuantityControllerProvider);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -23,7 +23,7 @@ class ShoppingCartScreen extends ConsumerWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Giỏ hàng',
+          'Shopping Cart',
           style: TextStyle(
             color: Colors.black,
             fontSize: 18,
@@ -34,8 +34,6 @@ class ShoppingCartScreen extends ConsumerWidget {
       ),
       body: cartItemAsync.when(
         data: (cartItem) {
-
-
           if (cartItem.isEmpty) {
             return const Center(child: Text("Shopping cart is empty"));
           }
@@ -43,12 +41,16 @@ class ShoppingCartScreen extends ConsumerWidget {
             children: [
               // Select All Checkbox
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Row(
                   children: [
                     Checkbox(
-                      value: cartItem.isNotEmpty &&
-                             selectedItems.length == cartItem.length,
+                      value:
+                          cartItem.isNotEmpty &&
+                          selectedItems.length == cartItem.length,
                       onChanged: (_) {
                         if (selectedItems.length == cartItem.length) {
                           selectedNotifier.clear();
@@ -57,7 +59,13 @@ class ShoppingCartScreen extends ConsumerWidget {
                         }
                       },
                     ),
-                    const Text('Chọn tất cả',style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500),)
+                    const Text(
+                      'Select all',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -109,7 +117,7 @@ class ShoppingCartScreen extends ConsumerWidget {
                                 ],
                               ),
 
-                              child: Image.asset(
+                              child: Image.network(
                                 item.productImage,
                                 fit: BoxFit.contain,
                               ),
@@ -130,7 +138,7 @@ class ShoppingCartScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '\$${item.productPrice.toStringAsFixed(2)}',
+                                    '\$${item.productPrice.toStringAsFixed(0)}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 16,
@@ -144,18 +152,26 @@ class ShoppingCartScreen extends ConsumerWidget {
                                       GestureDetector(
                                         onTap: () {
                                           if (item.quantity > 1) {
-                                            ref.read(cartQuantityControllerProvider.notifier).changeQuantity(
-                                              cartId: item.id,
-                                              newQuantity: item.quantity - 1,
-                                              userId: item.userId,
-                                            );
+                                            ref
+                                                .read(
+                                                  cartQuantityControllerProvider
+                                                      .notifier,
+                                                )
+                                                .changeQuantity(
+                                                  cartId: item.id,
+                                                  newQuantity:
+                                                      item.quantity - 1,
+                                                  userId: item.userId,
+                                                );
                                           }
                                         },
                                         child: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
                                             color: Colors.grey.shade100,
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           child: const Icon(
                                             Icons.remove,
@@ -164,7 +180,9 @@ class ShoppingCartScreen extends ConsumerWidget {
                                         ),
                                       ),
                                       Container(
-                                        margin: const EdgeInsets.symmetric(horizontal: 12),
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                        ),
                                         child: Text(
                                           '${item.quantity}',
                                           style: const TextStyle(
@@ -175,17 +193,24 @@ class ShoppingCartScreen extends ConsumerWidget {
                                       ),
                                       GestureDetector(
                                         onTap: () {
-                                          ref.read(cartQuantityControllerProvider.notifier).changeQuantity(
-                                            cartId: item.id,
-                                            newQuantity: item.quantity + 1,
-                                            userId: item.userId,
-                                          );
+                                          ref
+                                              .read(
+                                                cartQuantityControllerProvider
+                                                    .notifier,
+                                              )
+                                              .changeQuantity(
+                                                cartId: item.id,
+                                                newQuantity: item.quantity + 1,
+                                                userId: item.userId,
+                                              );
                                         },
                                         child: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
                                             color: Colors.grey.shade100,
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           child: const Icon(
                                             Icons.add,
@@ -214,10 +239,12 @@ class ShoppingCartScreen extends ConsumerWidget {
 
                                 //TODO: delete product
                                 IconButton(
-                                  onPressed: ()async{
-                                    try{
-                                     await ref.read(deleteCartItemProvider(item.id).future);
-                                    }catch(e){
+                                  onPressed: () async {
+                                    try {
+                                      await ref.read(
+                                        deleteCartItemProvider(item.id).future,
+                                      );
+                                    } catch (e) {
                                       print(e);
                                     }
                                   },
@@ -242,13 +269,15 @@ class ShoppingCartScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(30),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.05),
                       blurRadius: 10,
                       offset: const Offset(0, -5),
-                    )
+                    ),
                   ],
                 ),
                 child: Column(
@@ -261,35 +290,43 @@ class ShoppingCartScreen extends ConsumerWidget {
                           'Total: ',
                           style: TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          '\$${ref.watch(selectedItemsTotalProvider(cartItem)).toStringAsFixed(2)}',
+                          '\$${ref.watch(selectedItemsTotalProvider(cartItem)).toStringAsFixed(0)}',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 18
+                            fontSize: 18,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20,),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue.shade400,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)
+                          borderRadius: BorderRadius.circular(15),
                         ),
                       ),
-                      onPressed: ref.watch(selectedCartProvider).isEmpty ? null : (){},
+                      onPressed:
+                          ref.watch(selectedCartProvider).isEmpty
+                              ? null
+                              : () {
+                        final totalPrice = ref.watch(selectedItemsTotalProvider(cartItem));
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PaymentScreen(totalAmount:totalPrice),
+                                  ),
+                                );
+                              },
                       child: const Text(
                         'Checkout',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16
-                        ),
-                      )
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                     ),
                   ],
                 ),

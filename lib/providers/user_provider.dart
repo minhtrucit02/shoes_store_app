@@ -23,3 +23,8 @@ final getEmailProvider = FutureProvider.family<String?,String>((ref,userId){
   final service = ref.watch(userServiceProvider);
   return service.getEmailUser(userId);
 });
+
+final getUserProvider = FutureProvider.family<UserDB?,String>((ref,userId){
+  final service = ref.watch(userServiceProvider);
+  return service.getUserById(userId);
+});

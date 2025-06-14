@@ -10,9 +10,52 @@ class CartItemServiceImpl implements CartItemService {
       'https://shosestore-7c86e-default-rtdb.firebaseio.com/';
   @override
   Future<void> addCartItem(CartItem cartItem) async {
-    final url = Uri.parse('$baseUrl/cartItems.json');
-    final response = await http.post(url, body: jsonEncode(cartItem.toJson()));
-    if (response.statusCode != 200) {
+    final getUrl = Uri.parse('$baseUrl/cartItems.json');
+    final getResponse = await http.get(getUrl);
+
+    if (getResponse.statusCode == 200) {
+      final data = jsonDecode(getResponse.body);
+
+      if (data != null && data is Map<String, dynamic>) {
+        String? existingId;
+        int existingQuantity = 0;
+
+        data.forEach((key, value) {
+          final item = CartItem.fromJson({
+            ...Map<String, dynamic>.from(value),
+            'id': key,
+          });
+
+          if (item.userId == cartItem.userId &&
+              item.productId == cartItem.productId &&
+              item.productSize == cartItem.productSize &&
+              item.productImage == cartItem.productImage &&
+              item.status == cartItem.status) {
+            existingId = key;
+            existingQuantity = item.quantity;
+          }
+        });
+
+        if (existingId != null) {
+          final updateUrl = Uri.parse('$baseUrl/cartItems/$existingId.json');
+          final patchResponse = await http.patch(
+            updateUrl,
+            body: jsonEncode({'quantity': existingQuantity + 1}),
+          );
+          if (patchResponse.statusCode != 200) {
+            throw Exception('Failed to update cart quantity');
+          }
+          return;
+        }
+      }
+    }
+
+    final postUrl = Uri.parse('$baseUrl/cartItems.json');
+    final postResponse = await http.post(
+      postUrl,
+      body: jsonEncode(cartItem.toJson()),
+    );
+    if (postResponse.statusCode != 200) {
       throw Exception('Failed to add cart item');
     }
   }

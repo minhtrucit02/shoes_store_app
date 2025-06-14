@@ -66,4 +66,23 @@ class ProductServiceImpl implements ProductService {
       return null;
     }
   }
+
+  @override
+  Stream<List<int>> getProductSizes(String productId, String imageKey) {
+    final ref = database.ref('products/$productId/listImageProduct/$imageKey/listProductSize');
+
+    return ref.onValue.map((event) {
+      final data = event.snapshot.value as Map<dynamic, dynamic>?;
+
+      if (data == null) return [];
+
+      final sizes = data.entries
+          .map((entry) => (entry.value as Map)['size'])
+          .whereType<int>()
+          .toList();
+
+      return sizes;
+    });
+  }
+
 }

@@ -5,4 +5,5 @@ abstract class ProductService{
   Stream<List<Product>> getAllProducts();
   Future<Product?> getProductById(String productId);
   Future<void> deleteProduct(String productId);
+  Stream<List<int>> getProductSizes(String productId,String imageKey);
 }

@@ -8,7 +8,6 @@ class Product {
     required this.name,
     required this.price,
     required this.listImageProduct,
-    required this.listProductSize,
     required this.description,
     required this.createAt,
   });
@@ -18,13 +17,11 @@ class Product {
   final String name;
   final double price;
   final Map<String, ImageProduct> listImageProduct;
-  final Map<String, ProductSize> listProductSize;
   final String description;
   final String createAt;
 
   factory Product.fromRealtime(Map<String, dynamic> data) {
-    final imageMap = (data['listImageProduct'] as Map<dynamic, dynamic>?) ?? {};
-    final sizeMap = (data['listProductSize'] as Map<dynamic, dynamic>?) ?? {};
+    final imageMap = data['listImageProduct'] as Map<dynamic, dynamic>? ?? {};
 
     return Product(
       id: data['id'] ?? '',
@@ -34,15 +31,9 @@ class Product {
       description: data['description'] ?? '',
       createAt: data['createAt'] ?? '',
       listImageProduct: imageMap.map(
-        (key, value) => MapEntry(
+            (key, value) => MapEntry(
           key.toString(),
           ImageProduct.fromJson(Map<String, dynamic>.from(value)),
-        ),
-      ),
-      listProductSize: sizeMap.map(
-        (key, value) => MapEntry(
-          key.toString(),
-          ProductSize.fromJson(Map<String, dynamic>.from(value)),
         ),
       ),
     );
@@ -55,9 +46,8 @@ class Product {
     'price': price,
     'description': description,
     'createAt': createAt,
-    'listImageProduct':
-    listImageProduct.map((key, value) => MapEntry(key, value.toJson())),
-    'listProductSize':
-    listProductSize.map((key, value) => MapEntry(key, value.toJson())),
+    'listImageProduct': listImageProduct.map(
+          (key, value) => MapEntry(key, value.toJson()),
+    ),
   };
 }

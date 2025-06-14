@@ -39,12 +39,13 @@ class BrandCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Image.asset(
-              logo,
-              width: 24,
-              height: 24,
-              fit: BoxFit.contain,
-            ),
+            // Image.asset(
+            //   logo,
+            //   width: 24,
+            //   height: 24,
+            //   fit: BoxFit.contain,
+            // ),
+            Image.network(logo),
             AnimatedOpacity(
               duration: const Duration(milliseconds: 300),
               opacity: isSelected ? 1.0 : 0.0,

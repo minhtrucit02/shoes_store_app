@@ -72,10 +72,10 @@ flutter:
   assets:
     - assets/logo/
     - assets/google/
-    - assets/nike/
-    - assets/adidas/
-    - assets/converse/
-    - assets/puma/
+    - assets/Nike/
+    - assets/Adidas/
+    - assets/Converse/
+    - assets/Puma/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

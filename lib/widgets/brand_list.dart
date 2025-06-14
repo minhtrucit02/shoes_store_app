@@ -42,7 +42,8 @@ class BrandList extends ConsumerWidget {
                     offset: const Offset(0, 0),
                     child: BrandCard(
                       brand: brand['brand']!,
-                      logo: 'assets/logo/${brand['imagePath']}',
+                      // logo: 'assets/logo/${brand['imagePath']}',
+                      logo: '${brand['imagePath']}',
                       isSelected: index == selectedIndex,
                       onTap: () {
                         ref.read(selectedBrandIndexProvider.notifier).state = index;

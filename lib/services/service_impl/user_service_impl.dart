@@ -4,16 +4,13 @@ import 'package:shoes_store_app/models/userDB.dart';
 import 'package:shoes_store_app/services/user_service.dart';
 import 'package:http/http.dart' as http;
 
-class UserServiceImpl implements UserService{
+class UserServiceImpl implements UserService {
   final String baseUrl = 'https://shosestore-7c86e-default-rtdb.firebaseio.com';
 
   @override
   Future<void> addUser(UserDB user) async {
     final url = Uri.parse('$baseUrl/users/${user.id}.json');
-    final response = await http.put(
-      url,
-      body: jsonEncode(user.toJson()),
-    );
+    final response = await http.put(url, body: jsonEncode(user.toJson()));
 
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('Failed to add user');
@@ -21,18 +18,41 @@ class UserServiceImpl implements UserService{
   }
 
   @override
-  Future<String?> getEmailUser(String userId)async {
+  Future<String?> getEmailUser(String userId) async {
     final url = Uri.parse('$baseUrl/users/$userId.json');
     final response = await http.get(url);
-    if(response.statusCode ==200){
+    if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      if(data != null && data['email'] != null ){
+      if (data != null && data['email'] != null) {
         return data['email'] as String;
       }
     }
     return null;
   }
 
+  @override
+  Future<UserDB?> getUserById(String userId) async {
+    final url = Uri.parse('$baseUrl/users/$userId.json');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data != null) {
+        return UserDB.fromJson(Map<String, dynamic>.from(data));
+      } else {
+        print('No user with $userId');
+        return null;
+      }
+    } else {
+      throw Exception("Error with: ${response.statusCode}");
+    }
+  }
 
-
+  @override
+  Future<void> updateUser(UserDB user) async {
+    final url = Uri.parse('$baseUrl/users/${user.id}.json');
+    final response = await http.put(url,body: jsonEncode(user.toJson()));
+    if (response.statusCode != 200) {
+      throw Exception('Cập nhật thất bại');
+    }
+  }
 }
