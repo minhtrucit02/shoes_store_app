@@ -382,7 +382,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                     ),
                     onPressed: handlePayment,
                     child: Text(
-                      'Thanh toán',
+                      'Payment',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,

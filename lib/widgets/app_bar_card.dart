@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shoes_store_app/screeen/shopping_cart_screen.dart';
 
 class AppBarCard extends StatelessWidget{
   const AppBarCard({super.key});
@@ -37,8 +38,9 @@ class AppBarCard extends StatelessWidget{
           children: [
             IconButton(
               icon: Icon(Icons.shopping_bag_outlined),
-              onPressed:(){},
-              // _onShoppingBagPressed,
+              onPressed:(){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> const ShoppingCartScreen()));
+              },
             ),
             Positioned(
               right: 8,

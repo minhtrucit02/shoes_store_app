@@ -157,7 +157,7 @@ class ShoppingCartScreen extends ConsumerWidget {
                                                   cartQuantityControllerProvider
                                                       .notifier,
                                                 )
-                                                .changeQuantity(
+                                                .updateQuantity(
                                                   cartId: item.id,
                                                   newQuantity:
                                                       item.quantity - 1,
@@ -198,7 +198,7 @@ class ShoppingCartScreen extends ConsumerWidget {
                                                 cartQuantityControllerProvider
                                                     .notifier,
                                               )
-                                              .changeQuantity(
+                                              .updateQuantity(
                                                 cartId: item.id,
                                                 newQuantity: item.quantity + 1,
                                                 userId: item.userId,
