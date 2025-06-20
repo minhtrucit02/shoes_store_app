@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import '../models/product.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends StatefulWidget {
   final Product product;
 
   const ProductCard({super.key, required this.product});
 
   @override
+  State<ProductCard> createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  bool isFavorited = false;
+
+  @override
   Widget build(BuildContext context) {
-    final firstImage = product.listImageProduct.values.first;
+    final firstImage = widget.product.listImageProduct.values.first;
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -27,14 +34,25 @@ class ProductCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Center(
-              child: Image.network(
-                firstImage.url,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.error_outline, size: 48),
-              )
-
+            child: Stack(
+              fit: StackFit.expand,
+              children:[ Center(
+                child: Image.network(
+                  firstImage.url,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.error_outline, size: 48),
+                ),
+              ),
+                Positioned(
+                  top: 4.0,
+                    right: 4.0,
+                    child: IconButton(onPressed: (){
+                      setState(() {
+                        isFavorited = !isFavorited;
+                      });
+                    }, icon: Icon(isFavorited ?  Icons.favorite : Icons.favorite_border),iconSize: 30.0,color: Colors.red[400],))
+              ]
             ),
           ),
           const SizedBox(height: 12),
@@ -55,7 +73,7 @@ class ProductCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            product.name,
+            widget.product.name,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -68,7 +86,7 @@ class ProductCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "\$${product.price.toStringAsFixed(0)}",
+                "\$${widget.product.price.toStringAsFixed(0)}",
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,

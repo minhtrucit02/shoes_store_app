@@ -1,9 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shoes_store_app/models/enum_cart_status.dart';
 import 'package:shoes_store_app/models/enum_payment.dart';
 import 'package:shoes_store_app/models/payment.dart';
+import 'package:shoes_store_app/models/product_update.dart';
+import 'package:shoes_store_app/providers/cart_item_provider.dart';
+import 'package:shoes_store_app/providers/cart_provider.dart';
 import 'package:shoes_store_app/providers/payment_provider.dart';
+import 'package:shoes_store_app/providers/product_provider.dart';
+import 'package:shoes_store_app/widgets/address_user.dart';
+
+import '../models/cart_item.dart';
+import '../widgets/payment_success.dart';
 
 class PaymentScreen extends ConsumerStatefulWidget {
   final double totalAmount;
@@ -24,6 +33,8 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     double totalCost = shopping + widget.totalAmount;
     final selectedMethod = ref.watch(selectedMethodProvider);
     final addPayment = ref.watch(paymentServiceProvider);
+    final addCartItemInCar = ref.watch(cartServiceProvider);
+
     @override
     void dispose() {
       userNameController.dispose();
@@ -43,7 +54,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       }
     }
 
-    void handlePayment() {
+    void handlePayment() async {
       if (userNameController.text.trim().isEmpty ||
           phoneController.text.trim().isEmpty ||
           addressController.text.trim().isEmpty) {
@@ -62,14 +73,84 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
           createAt: DateTime.now().toString(),
         );
 
-        addPayment.addPayment(paymentAction);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Thanh toán thành công')),
-        );
-      }
-    }
+        try {
+          await addPayment.addPayment(paymentAction);
+          final user = FirebaseAuth.instance.currentUser;
+          final selectedCartItem = ref.read(selectedCartProvider);
 
-    return Scaffold(
+          int totalQuantity = 0;
+          Map<String, CartItem> processedItems = {};
+
+          for (final id in selectedCartItem) {
+            final cartItem = await ref.read(
+              getCheckedCartItemsProvider(id).future,
+            );
+
+            if (cartItem != null) {
+              totalQuantity += cartItem.quantity;
+              processedItems[id] = cartItem;
+            }
+          }
+
+          // Then process each item
+          for (final entry in processedItems.entries) {
+            final id = entry.key;
+            final cartItem = entry.value;
+
+            await ref.read(
+              changeCartStatusProvider((id, CartItemStatus.paid)).future,
+            );
+
+            final updatedCartItem = CartItem(
+              id: cartItem.id,
+              cartId: cartItem.cartId,
+              productId: cartItem.productId,
+              productImage: cartItem.productImage,
+              productName: cartItem.productName,
+              productSize: cartItem.productSize,
+              quantity: cartItem.quantity,
+              price: cartItem.price,
+              cartStatus: CartItemStatus.paid,
+              createdAt: cartItem.createdAt,
+            );
+
+            await ref.read(
+              addCartItemInCartProvider((updatedCartItem, user!.uid)).future,
+            );
+
+            // Update product quantity
+            final productUpdate = ProductUpdate(
+              productId: updatedCartItem.productId,
+              productSize: updatedCartItem.productSize,
+              quantity: updatedCartItem.quantity,
+              imageUrl: updatedCartItem.productImage,
+            );
+            await ref.read(
+              updateQuantityProductSizeProvider(productUpdate).future,
+            );
+
+            await ref.read(deleteCartItemProvider(id).future);
+          }
+
+          // Update cart with total quantity once at the end
+          await ref.read(
+            updateCartProvider((
+            user!.uid,
+            totalQuantity,
+            widget.totalAmount,
+            )).future,
+          );
+
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const PaymentSuccessDialog(),
+          );
+        } catch (e) {
+          throw Exception('Error: $e');
+        }
+      }
+    }    return Scaffold(
       backgroundColor: const Color(0xFFF8F9FB),
       appBar: AppBar(
         title: Text(
@@ -204,9 +285,24 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                               ),
                             ),
                           ),
-                          Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            color: Colors.grey[600],
+                          GestureDetector(
+                            onTap: () async {
+                              final selectedAddress = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const AddressUser(),
+                                ),
+                              );
+
+                              if (selectedAddress != null &&
+                                  selectedAddress is String) {
+                                addressController.text = selectedAddress;
+                              }
+                            },
+                            child: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: Colors.grey[600],
+                            ),
                           ),
                         ],
                       ),
@@ -290,7 +386,9 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+
+                      //TODO: List of cartItem
+                      const SizedBox(height: 150),
                       //TODO: Total price
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -368,7 +466,6 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                     ],
                   ),
                 ),
-
                 //TODO: Payment button
                 SizedBox(
                   width: double.infinity,

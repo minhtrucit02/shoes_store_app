@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shoes_store_app/screeen/home_screen.dart';
 import 'package:shoes_store_app/screeen/sign_up_screen.dart';
 
+import '../providers/cart_provider.dart';
 import '../providers/user_provider.dart';
 
 
@@ -34,6 +35,10 @@ class _LoginState extends ConsumerState<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await ref.read(createCartProvider(user.uid).future);
+      }
       if(mounted){
         Navigator.pushAndRemoveUntil(
           context,
@@ -71,6 +76,10 @@ class _LoginState extends ConsumerState<LoginScreen> {
         _errorMessage = result;
       });
     } else {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await ref.read(createCartProvider(user.uid).future);
+      }
       if (mounted) {
         Navigator.pushAndRemoveUntil(
           context,

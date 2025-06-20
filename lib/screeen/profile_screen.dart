@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shoes_store_app/screeen/history_payments.dart';
 
 import '../providers/user_provider.dart';
 import 'login_screen.dart';
@@ -260,7 +261,9 @@ class Profile extends ConsumerWidget {
                   _SettingsItem(
                     icon: Icons.shopping_bag_outlined,
                     title: 'My Orders',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const HistoryPaymentScreen()));
+                    },
                   ),
                   _SettingsItem(
                     icon: Icons.favorite_border,

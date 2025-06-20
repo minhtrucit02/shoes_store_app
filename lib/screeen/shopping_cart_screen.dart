@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shoes_store_app/models/enum_cart_status.dart';
 import 'package:shoes_store_app/providers/cart_item_provider.dart';
 import 'package:shoes_store_app/screeen/payment_screen.dart';
 
@@ -51,11 +52,21 @@ class ShoppingCartScreen extends ConsumerWidget {
                       value:
                           cartItem.isNotEmpty &&
                           selectedItems.length == cartItem.length,
-                      onChanged: (_) {
+                      onChanged: (_) async {
                         if (selectedItems.length == cartItem.length) {
                           selectedNotifier.clear();
+                          for (var item in cartItem) {
+                            await ref
+                                .read(changeCartStatusProvider((item.id, CartItemStatus.unpaid))
+                                .future);
+                          }
                         } else {
                           selectedNotifier.selectAll(cartItem);
+                          for (var item in cartItem) {
+                            await ref
+                                .read(changeCartStatusProvider((item.id, CartItemStatus.checked))
+                                .future);
+                          }
                         }
                       },
                     ),
@@ -92,11 +103,15 @@ class ShoppingCartScreen extends ConsumerWidget {
                             //TODO: checkbox product
                             Checkbox(
                               value: selectedItems.contains(item.id),
-                              onChanged: (bool? value) {
+                              onChanged: (bool? value) async{
                                 if (value == true) {
                                   selectedNotifier.add(item.id);
+                                  await ref.read(changeCartStatusProvider((item.id,CartItemStatus.checked)).future);
                                 } else {
                                   selectedNotifier.remove(item.id);
+                                  await ref.read(
+                                    changeCartStatusProvider((item.id, CartItemStatus.unpaid)).future,
+                                  );
                                 }
                               },
                             ),
@@ -138,7 +153,7 @@ class ShoppingCartScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '\$${item.productPrice.toStringAsFixed(0)}',
+                                    '\$${item.price.toStringAsFixed(0)}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 16,
@@ -161,7 +176,6 @@ class ShoppingCartScreen extends ConsumerWidget {
                                                   cartId: item.id,
                                                   newQuantity:
                                                       item.quantity - 1,
-                                                  userId: item.userId,
                                                 );
                                           }
                                         },
@@ -201,7 +215,6 @@ class ShoppingCartScreen extends ConsumerWidget {
                                               .updateQuantity(
                                                 cartId: item.id,
                                                 newQuantity: item.quantity + 1,
-                                                userId: item.userId,
                                               );
                                         },
                                         child: Container(

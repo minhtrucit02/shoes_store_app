@@ -48,7 +48,7 @@ class UserDao extends ChangeNotifier {
           email: email,
           phone: '',
           address: '',
-          createAt: DateTime.now().toIso8601String(),
+          createdAt: DateTime.now().toIso8601String(),
         );
         await ref.read(userServiceProvider).addUser(userDb);
       }
@@ -132,7 +132,7 @@ class UserDao extends ChangeNotifier {
           email: user.email ?? '',
           phone: '',
           address: '',
-          createAt: DateTime.now().toIso8601String(),
+          createdAt: DateTime.now().toIso8601String(),
         );
         await ref.read(userServiceProvider).addUser(userDB);
       }

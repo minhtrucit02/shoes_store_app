@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoes_store_app/models/product.dart';
+import 'package:shoes_store_app/models/product_update.dart';
 import 'package:shoes_store_app/services/service_impl/product_service_impl.dart';
 
 final selectedSizeProvider = StateProvider<int?>((ref) => null);
@@ -19,10 +20,19 @@ final getProductByIdProvider = FutureProvider.family<Product?,String>((ref,Strin
   return service.getProductById(productId);
 });
 
-final getProductSizesProvider = FutureProvider.family<List<int>, (String productId, String imageKey)>((ref, params) {
+final getProductSizesProvider = FutureProvider.family<Map<int, int>, (String productId, String imageKey)>((ref, params) async {
   final service = ref.watch(productServiceProvider);
   final (productId, imageKey) = params;
-  return service.getProductSizes(productId, imageKey).first;
+
+  final productSizes = await service.getProductSizes(productId, imageKey).first;
+
+  return {
+    for (var ps in productSizes)
+      ps.size: ps.quantity,
+  };
 });
 
-
+final updateQuantityProductSizeProvider = FutureProvider.family<void,ProductUpdate>((ref,productUpdate) async{
+  final service = ref.watch(productServiceProvider);
+  await service.updateProductSizeQuantity(productUpdate);
+});

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoes_store_app/providers/home_provider.dart';
@@ -31,8 +32,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         break;
       case 2: // Shopping bag
       // TODO: Navigate to Cart screen
+      final user = FirebaseAuth.instance.currentUser;
+      if(user == null){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please login ...')),
+        );
+      }else{
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => const ShoppingCartScreen()));
+      }
+
         break;
       case 3: // Notifications
       // TODO: Navigate to Notifications screen
