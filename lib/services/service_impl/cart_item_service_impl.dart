@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:shoes_store_app/models/cart_item.dart';
 import 'package:shoes_store_app/models/enum_cart_status.dart';
 import 'package:shoes_store_app/services/cart_item_service.dart';
@@ -26,11 +27,10 @@ class CartItemServiceImpl implements CartItemService {
             'id': key,
           });
 
-          if (item.userId == cartItem.userId &&
-              item.productId == cartItem.productId &&
+          if (item.productId == cartItem.productId &&
               item.productSize == cartItem.productSize &&
               item.productImage == cartItem.productImage &&
-              item.status == cartItem.status) {
+              item.productName == cartItem.productName) {
             existingId = key;
             existingQuantity = item.quantity;
           }
@@ -70,14 +70,13 @@ class CartItemServiceImpl implements CartItemService {
   }
 
   @override
-  Future<List<CartItem>> getCartItemByUserId(String userId) async {
-    final url = Uri.parse('$baseUrl/cartItems.json');
-    final response = await http.get(url);
+  Stream<List<CartItem>> getCartItemByUserId(String userId) {
+    final ref = FirebaseDatabase.instance.ref('cartItems');
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+    return ref.onValue.map((event) {
+      final data = event.snapshot.value;
 
-      if (data != null && data is Map<String, dynamic>) {
+      if (data != null && data is Map) {
         final List<CartItem> items = [];
 
         data.forEach((key, value) {
@@ -86,7 +85,8 @@ class CartItemServiceImpl implements CartItemService {
             'id': key,
           });
 
-          if (item.userId == userId && item.status == CartStatus.unpaid) {
+          if (item.cartStatus != CartItemStatus.paid &&
+              item.cartId == userId) {
             items.add(item);
           }
         });
@@ -95,9 +95,7 @@ class CartItemServiceImpl implements CartItemService {
       } else {
         return [];
       }
-    } else {
-      throw Exception('Failed to load cart items');
-    }
+    });
   }
 
   @override
@@ -111,4 +109,57 @@ class CartItemServiceImpl implements CartItemService {
       throw Exception('Failed to update quantity');
     }
   }
+
+  @override
+  Future<void> changeStatusCart (
+    String cartItemId,
+    CartItemStatus cartItemStatus,
+  ) async {
+    try {
+      final url = Uri.parse('$baseUrl/cartItems/$cartItemId.json');
+      final response = await http.patch(
+        url,
+        body: jsonEncode({'cartStatus': cartItemStatus.name}),
+      );
+      if (response.statusCode != 200) {
+        throw Exception('Failed to change cart status');
+      }
+    } catch (e) {
+      print("Error changing cart status: $e");
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> addCartItemIdInCart(String cartItemId, String cartId) async {
+    try {
+      final url = Uri.parse(
+        '$baseUrl/carts/$cartId/listCartId/$cartItemId.json',
+      );
+      final response = await http.put(url, body: jsonEncode(true));
+
+      if (response.statusCode == 200) {
+        print('Successfully added cartItemId to cart.');
+      } else {
+        throw Exception(
+          'Failed to add cartItemId to cart. Status: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print('Error adding cartItemId to cart: $e');
+    }
+  }
+
+  @override
+  Stream<CartItem?> getCheckedCartItemsByCartItemId(String cartItemId) {
+    final ref = FirebaseDatabase.instance.ref('cartItems/$cartItemId');
+    return ref.onValue.map((event) {
+      final data = event.snapshot.value as Map<dynamic, dynamic>?;
+      if (data == null) return null;
+      final item = CartItem.fromJson(Map<String, dynamic>.from(data));
+      return item.cartStatus.displayName == 'checked' ? item : null;
+    });
+  }
+
+
 }

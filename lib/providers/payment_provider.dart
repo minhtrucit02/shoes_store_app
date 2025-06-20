@@ -14,3 +14,8 @@ final addPaymentProvider = FutureProvider.family<void,Payment>((ref,payment) asy
   await service.addPayment(payment);
 });
 final selectedMethodProvider = StateProvider<MethodPayment>((ref) => MethodPayment.paymentCard);
+
+final getPaymentByUserIdProvider = FutureProvider.family<List<Payment>,String>((ref,userId)async{
+  final service = ref.watch(paymentServiceProvider);
+  return await service.getPaymentByUserId(userId);
+});

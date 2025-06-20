@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart';
 import 'package:shoes_store_app/models/userDB.dart';
 import 'package:shoes_store_app/providers/user_provider.dart';
 
@@ -32,7 +31,7 @@ class UserDao extends ChangeNotifier {
   String? email() => auth.currentUser?.email;
 
   // Sign Up
-  Future<String?> signup(String email, String password, String name) async {
+  Future<String?> signup(String email, String password, String name) async  {
     try {
       final userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
@@ -48,7 +47,7 @@ class UserDao extends ChangeNotifier {
           email: email,
           phone: '',
           address: '',
-          createAt: DateTime.now().toIso8601String(),
+          createdAt: DateTime.now().toIso8601String(),
         );
         await ref.read(userServiceProvider).addUser(userDb);
       }
@@ -132,7 +131,7 @@ class UserDao extends ChangeNotifier {
           email: user.email ?? '',
           phone: '',
           address: '',
-          createAt: DateTime.now().toIso8601String(),
+          createdAt: DateTime.now().toIso8601String(),
         );
         await ref.read(userServiceProvider).addUser(userDB);
       }

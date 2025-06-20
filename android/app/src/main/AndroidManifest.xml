@@ -1,4 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.minhtruc.shoes_store_app">
+<uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="shoes_store_app"
         android:name="${applicationName}"

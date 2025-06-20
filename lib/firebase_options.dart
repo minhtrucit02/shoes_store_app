@@ -62,7 +62,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyA9zda2-gApf3BnmmcrbVXwxzdG5Nnx9_M',
-    appId: '1:204991613682:android:fef2d77335945804359e6b',
+    appId: '1:204991613682:android:3dfe2b9fad8bf024359e6b',
     messagingSenderId: '204991613682',
     projectId: 'shosestore-7c86e',
     databaseURL: 'https://shosestore-7c86e-default-rtdb.firebaseio.com',

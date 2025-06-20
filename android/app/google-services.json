@@ -79,6 +79,43 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:204991613682:android:3dfe2b9fad8bf024359e6b",
+        "android_client_info": {
+          "package_name": "com.minhtruc.shoes_store_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "204991613682-qlneu6hnfre09vpo8hrbksknubobaljf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.minhtruc.shoes_store_app",
+            "certificate_hash": "882da27d3425e93f880c7355248a5772fa0c2f65"
+          }
+        },
+        {
+          "client_id": "204991613682-eeovkmosgai6otvp23t9l8d9mm5io7ls.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9zda2-gApf3BnmmcrbVXwxzdG5Nnx9_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "204991613682-eeovkmosgai6otvp23t9l8d9mm5io7ls.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

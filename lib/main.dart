@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoes_store_app/screeen/home_screen.dart';
 import 'package:shoes_store_app/screeen/payment_screen.dart';
+import 'package:shoes_store_app/screeen/start_screen.dart';
 
 FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
@@ -24,7 +25,7 @@ class MyApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       title: 'Shoes Store App',
       navigatorObservers: [FirebaseAnalyticsObserver(analytics: analytics)],
-      home: HomeScreen(),
+      home: StartPage(),
     );
   }
 }

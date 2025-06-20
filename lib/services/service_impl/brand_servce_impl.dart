@@ -38,7 +38,6 @@ class BrandServiceImpl implements BrandService{
             }
           });
 
-          brands.sort((a, b) => a.id.compareTo(b.id));
           return brands;
         } else {
           print("Dữ liệu không hợp lệ: $data");

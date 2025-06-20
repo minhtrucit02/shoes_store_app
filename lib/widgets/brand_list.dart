@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../providers/brand_service_provider.dart';
 import 'brand_card.dart';
-
 
 class BrandList extends ConsumerWidget {
   const BrandList({super.key});
@@ -12,11 +10,21 @@ class BrandList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final brandAsync = ref.watch(brandListProvider);
     final selectedIndex = ref.watch(selectedBrandIndexProvider);
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return brandAsync.when(
-      loading: () => _buildLoadingShimmer(),
+      loading: () => _buildLoadingShimmer(screenWidth),
       error: (error, _) => Center(
-        child: Text('Lỗi: $error'),
+        child: Container(
+          padding: EdgeInsets.all(screenWidth * 0.04),
+          child: Text(
+            'Lỗi: $error',
+            style: TextStyle(
+              color: Colors.red[400],
+              fontSize: screenWidth * 0.035,
+            ),
+          ),
+        ),
       ),
       data: (brands) {
         final uniqueBrands = brands
@@ -25,24 +33,25 @@ class BrandList extends ConsumerWidget {
             .toList();
 
         return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 500),
+          duration: const Duration(milliseconds: 400),
           child: SizedBox(
             key: ValueKey<int>(uniqueBrands.length),
-            height: 60,
+            height: screenWidth * 0.13,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+              physics: const BouncingScrollPhysics(),
               itemCount: uniqueBrands.length,
               itemBuilder: (context, index) {
                 final brand = uniqueBrands[index];
                 return AnimatedOpacity(
-                  duration: Duration(milliseconds: 200 + (index * 100)),
+                  duration: Duration(milliseconds: 300 + (index * 50)),
                   opacity: 1.0,
                   child: AnimatedSlide(
-                    duration: Duration(milliseconds: 200 + (index * 100)),
+                    duration: Duration(milliseconds: 300 + (index * 50)),
                     offset: const Offset(0, 0),
                     child: BrandCard(
                       brand: brand['brand']!,
-                      // logo: 'assets/logo/${brand['imagePath']}',
                       logo: '${brand['imagePath']}',
                       isSelected: index == selectedIndex,
                       onTap: () {
@@ -59,19 +68,20 @@ class BrandList extends ConsumerWidget {
     );
   }
 
-  Widget _buildLoadingShimmer() {
+  Widget _buildLoadingShimmer(double screenWidth) {
     return SizedBox(
-      height: 60,
+      height: screenWidth * 0.13,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
         itemCount: 5,
         itemBuilder: (context, index) {
           return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            width: 100,
+            margin: EdgeInsets.only(right: screenWidth * 0.03),
+            width: screenWidth * 0.25,
+            height: screenWidth * 0.13,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(screenWidth * 0.03),
               gradient: LinearGradient(
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
@@ -80,10 +90,8 @@ class BrandList extends ConsumerWidget {
                   Colors.grey[100]!,
                   Colors.grey[300]!,
                 ],
-                stops: const [0.0, 0.5, 1.0],
               ),
             ),
-            child: const SizedBox(),
           );
         },
       ),

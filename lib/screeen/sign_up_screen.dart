@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/user_provider.dart';
+import '../providers/auth_provider.dart';
 import 'login_screen.dart';
 
 class Signup extends ConsumerStatefulWidget {
@@ -16,7 +16,6 @@ class _SignupState extends ConsumerState<Signup> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  String? errorMessage;
 
   @override
   void dispose() {
@@ -26,9 +25,30 @@ class _SignupState extends ConsumerState<Signup> {
     super.dispose();
   }
 
+  Future<void> _handleSignup() async {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    final authNotifier = ref.read(authProvider.notifier);
+    final error = await authNotifier.signup(email, password, name);
+
+    if (error == null && mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+            (route) => false,
+      );
+    } else if (error != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final userDao = ref.watch(userDaoProvider);
+    final authState = ref.watch(authProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
@@ -72,6 +92,7 @@ class _SignupState extends ConsumerState<Signup> {
                 decoration: _inputDecoration("Email"),
               ),
               const SizedBox(height: 16),
+
               const Text("Password"),
               const SizedBox(height: 6),
               TextFormField(
@@ -90,30 +111,18 @@ class _SignupState extends ConsumerState<Signup> {
               ),
               const SizedBox(height: 24),
 
-              // Sign Up Button
+              if (authState.errorMessage != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  authState.errorMessage!,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ],
+
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    final result = await userDao.signup(
-                      _emailController.text.trim(),
-                      _passwordController.text.trim(),
-                      _nameController.text.trim(),
-                    );
-                    if(result == null){
-                      if(!context.mounted) return;
-                      Navigator.pushAndRemoveUntil(context,
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
-                            (Route<dynamic> route) => false,
-                      );
-                    } else {
-                      if(context.mounted){
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(result)),
-                        );
-                      }
-                    }
-                  },
+                  onPressed: authState.isLoading ? null : _handleSignup,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF3B82F6),
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -121,24 +130,26 @@ class _SignupState extends ConsumerState<Signup> {
                       borderRadius: BorderRadius.circular(25),
                     ),
                   ),
-                  child: const Text("Sign In", style: TextStyle(color: Colors.white),),
+                  child: authState.isLoading
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                      : const Text("Sign Up", style: TextStyle(color: Colors.white)),
                 ),
               ),
 
               const SizedBox(height: 12),
 
-              // Google Sign Up
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    // TODO: Implement Google sign-up
+                    // Optional: add Google signup
                   },
-                  icon: Image.asset(
-                    'assets/google/google.png',
-                    height: 24,
-                  ),
-                  label: const Text("Sign in with google"),
+                  icon: Image.asset('assets/google/google.png', height: 24),
+                  label: const Text("Sign up with Google"),
                   style: OutlinedButton.styleFrom(
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -152,15 +163,16 @@ class _SignupState extends ConsumerState<Signup> {
 
               const SizedBox(height: 20),
 
-              // Footer
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text("Already Have An Account?"),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context)=> const LoginScreen()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      );
                     },
                     child: const Text(
                       "Sign In",

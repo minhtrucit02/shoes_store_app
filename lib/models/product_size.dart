@@ -8,8 +8,8 @@ class ProductSize {
   final int quantity;
 
   factory ProductSize.fromJson(Map<String, dynamic> json) => ProductSize(
-      size: json['size'],
-      quantity: json['quantity']
+      size: json['size'] ?? 0,
+      quantity: json['quantity'] ?? 0
   );
 
   Map<String, dynamic> toJson() => {

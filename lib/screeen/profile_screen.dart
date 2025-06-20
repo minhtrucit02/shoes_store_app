@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shoes_store_app/providers/auth_provider.dart';
+import 'package:shoes_store_app/screeen/history_payments.dart';
+import 'package:shoes_store_app/screeen/home_screen.dart';
+import 'package:shoes_store_app/screeen/sign_up_screen.dart';
 
 import '../providers/user_provider.dart';
 import 'login_screen.dart';
@@ -10,10 +14,11 @@ class Profile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userDao = ref.watch(userDaoProvider);
-    final isLoggedIn = userDao.isLoggedIn();
+    final authState =ref.watch(authProvider);
+    final authNotifier = ref.read(authProvider.notifier);
+    final user = authNotifier.currentUser;
 
-    if (!isLoggedIn) {
+    if (user == null) {
       return Scaffold(
         backgroundColor: Colors.grey[100],
         appBar: AppBar(
@@ -83,6 +88,7 @@ class Profile extends ConsumerWidget {
                   child: Text(
                     'Login',
                     style: TextStyle(
+                      color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -94,7 +100,7 @@ class Profile extends ConsumerWidget {
                 OutlinedButton(
                   onPressed: () {
                     // TODO: Navigate to register screen
-                    Navigator.pushNamed(context, '/register');
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const Signup()));
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: Colors.blue),
@@ -152,8 +158,8 @@ class Profile extends ConsumerWidget {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundImage: userDao.photoURL != null && userDao.photoURL!.isNotEmpty
-                            ? NetworkImage(userDao.photoURL!)
+                        backgroundImage: user.photoURL != null
+                            ? NetworkImage(user.photoURL!)
                             : AssetImage('assets/images/default_avatar.png') as ImageProvider,                      ),
                       Positioned(
                         bottom: 0,
@@ -175,7 +181,7 @@ class Profile extends ConsumerWidget {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    '${userDao.displayName}',
+                    '${user.displayName}',
                     // userDao.displayName() ?? 'User',
                     style: TextStyle(
                       fontSize: 24,
@@ -184,7 +190,7 @@ class Profile extends ConsumerWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    userDao.email() ?? '',
+                    user.email! ?? '',
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 16,
@@ -260,7 +266,9 @@ class Profile extends ConsumerWidget {
                   _SettingsItem(
                     icon: Icons.shopping_bag_outlined,
                     title: 'My Orders',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const HistoryPaymentScreen()));
+                    },
                   ),
                   _SettingsItem(
                     icon: Icons.favorite_border,
@@ -318,9 +326,13 @@ class Profile extends ConsumerWidget {
             Padding(
               padding: EdgeInsets.all(20),
               child: ElevatedButton(
-                onPressed: () {
-                  userDao.logout();
-                  Navigator.pushReplacementNamed(context, '/login');
+                onPressed: ()async {
+                  await authNotifier.logout();
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => HomeScreen()),
+                        (route) => false,
+                  );
+
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
@@ -331,7 +343,7 @@ class Profile extends ConsumerWidget {
                   minimumSize: Size(double.infinity, 50),
                 ),
                 child: Text(
-                  'Sign Out',
+                  'Logout',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

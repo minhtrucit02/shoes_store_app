@@ -6,7 +6,7 @@ class UserDB {
     required this.email,
     required this.phone,
     required this.address,
-    required this.createAt,
+    required this.createdAt,
   });
   final String id;
   final String name;
@@ -14,7 +14,7 @@ class UserDB {
   final String email;
   final String phone;
   final String address;
-  final String createAt;
+  final String createdAt;
 
   factory UserDB.fromJson(Map<String, dynamic> data) {
     return UserDB(
@@ -24,7 +24,7 @@ class UserDB {
       email: data['email'],
       phone: data['phone'] ?? '',
       address: data['address'] ?? '',
-      createAt: data['createAt'] ?? '',
+      createdAt: data['createAt'] ?? '',
     );
   }
   Map<String, dynamic> toJson() => {
@@ -34,6 +34,6 @@ class UserDB {
     'email':email,
     'phone':phone,
     'address':address,
-    'createAt':createAt,
+    'createAt':createdAt,
   };
 }
