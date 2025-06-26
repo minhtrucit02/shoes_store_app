@@ -39,4 +39,10 @@ class PaymentServiceImpl implements PaymentService{
     return listPayment;
   }
 
+  @override
+  Future<List<Payment>> getPayment() {
+    // TODO: implement getPayment
+    throw UnimplementedError();
+  }
+
 }

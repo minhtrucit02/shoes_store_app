@@ -89,6 +89,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "204991613682-6uvi7inqp5fi6hlk8biqf95mc36dugh6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.minhtruc.shoes_store_app",
+            "certificate_hash": "5887077d54c95a49794aff9b19fd9a57ab6a78d1"
+          }
+        },
+        {
           "client_id": "204991613682-qlneu6hnfre09vpo8hrbksknubobaljf.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

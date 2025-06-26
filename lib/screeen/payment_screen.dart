@@ -33,7 +33,6 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     double totalCost = shopping + widget.totalAmount;
     final selectedMethod = ref.watch(selectedMethodProvider);
     final addPayment = ref.watch(paymentServiceProvider);
-    final addCartItemInCar = ref.watch(cartServiceProvider);
 
     @override
     void dispose() {

@@ -3,11 +3,10 @@ import 'package:shoes_store_app/services/service_impl/user_service_impl.dart';
 import 'package:shoes_store_app/services/user_service.dart';
 
 import '../models/userDB.dart';
-import '../services/user_dao.dart';
 
-final userDaoProvider = ChangeNotifierProvider<UserDao>((ref) {
-  return UserDao(ref);
-});
+// final userDaoProvider = ChangeNotifierProvider<UserDao>((ref) {
+//   return UserDao(ref);
+// });
 
 
 final userServiceProvider = Provider<UserService>((ref){

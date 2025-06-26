@@ -14,35 +14,31 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   AuthNotifier(this.ref) : super(const AuthState());
 
-  Future<void> login(String email, String password) async {
+  Future<String?> login(String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
-      state = state.copyWith(errorMessage: "Email or password cannot be empty.");
-      return;
+      return "Email or password cannot be empty.";
     }
 
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+      state = state.copyWith(currentUser: _auth.currentUser);
+      return null;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case "invalid-credential":
-          state = state.copyWith(errorMessage: "Email or password incorrect");
-          break;
+          return "Email or password incorrect";
         case "invalid-email":
-          state = state.copyWith(errorMessage: "Invalid email address.");
-          break;
+          return "Invalid email address.";
         case "user-not-found":
-          state = state.copyWith(errorMessage: "No user found with that email.");
-          break;
+          return "No user found with that email.";
         case "wrong-password":
-          state = state.copyWith(errorMessage: "Incorrect password.");
-          break;
+          return "Incorrect password.";
         default:
-          state = state.copyWith(errorMessage: e.message ?? "Login failed.");
+          return e.message ?? "Login failed.";
       }
     } catch (e) {
-      state = state.copyWith(errorMessage: "An unexpected error occurred.");
-      log(e.toString());
+      return "An unexpected error occurred.";
     } finally {
       state = state.copyWith(isLoading: false);
     }
@@ -66,6 +62,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final userCredential = await _auth.signInWithCredential(credential);
       final user = userCredential.user;
       if (user != null) {
+        state = state.copyWith(currentUser: user);
         final userService = ref.read(userServiceProvider);
         final existing = await userService.getEmailUser(user.uid);
         if (existing == null) {
@@ -136,8 +133,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
 
   Future<void> logout() async {
+    await GoogleSignIn().signOut();
     await _auth.signOut();
+    state = const AuthState();
   }
+
+
+  void initialize() {
+    state = state.copyWith(currentUser: _auth.currentUser);
+  }
+
 
   User? get currentUser => _auth.currentUser;
 }

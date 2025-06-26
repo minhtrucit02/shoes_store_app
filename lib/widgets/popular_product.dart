@@ -20,24 +20,26 @@ class PopularProduct extends ConsumerWidget {
         if (products.isEmpty) {
           return const Center(child: Text('No data product'));
         }
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.8,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
+        return SizedBox(
+          height: 250,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: products.length,
+            itemBuilder: (context, index) {
+              final product = products[index];
+              return GestureDetector(
+                onTap: () => onProductTap(product.id),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: SizedBox(
+                    width: 160,
+                    child: ProductCard(product: product),
+                  ),
+                ),
+              );
+            },
           ),
-          itemCount: products.length,
-          itemBuilder: (context, index) {
-            final product = products[index];
-            return GestureDetector(
-              onTap: () => onProductTap(product.id),
-              child: ProductCard(product: product),
-            );
-          },
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),

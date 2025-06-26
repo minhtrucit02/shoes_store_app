@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/auth_provider.dart';
+import '../providers/cart_provider.dart';
+import 'home_screen.dart';
 import 'login_screen.dart';
 
 class Signup extends ConsumerStatefulWidget {
@@ -15,6 +17,7 @@ class _SignupState extends ConsumerState<Signup> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
@@ -29,10 +32,16 @@ class _SignupState extends ConsumerState<Signup> {
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
 
     final authNotifier = ref.read(authProvider.notifier);
     final error = await authNotifier.signup(email, password, name);
-
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Passwords do not match")),
+      );
+      return;
+    }
     if (error == null && mounted) {
       Navigator.pushAndRemoveUntil(
         context,
@@ -43,6 +52,22 @@ class _SignupState extends ConsumerState<Signup> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(error)),
       );
+    }
+  }
+  Future<void> _signInWithGoogle() async {
+    final authNotifier = ref.read(authProvider.notifier);
+    await authNotifier.signInWithGoogle();
+
+    final user = authNotifier.currentUser;
+    if (user != null) {
+      await ref.read(createCartProvider(user.uid).future);
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+              (route) => false,
+        );
+      }
     }
   }
 
@@ -109,6 +134,24 @@ class _SignupState extends ConsumerState<Signup> {
                   ),
                 ),
               ),
+
+              const SizedBox(height: 16),
+              const Text("Confirm password"),
+              const SizedBox(height: 6),
+              TextFormField(
+                controller: _confirmPasswordController,
+                obscureText: _obscurePassword,
+                decoration: _inputDecoration("Confirm Password").copyWith(
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () => setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    }),
+                  ),
+                ),
+              ),
               const SizedBox(height: 24),
 
               if (authState.errorMessage != null) ...[
@@ -145,18 +188,16 @@ class _SignupState extends ConsumerState<Signup> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    // Optional: add Google signup
-                  },
+                  onPressed: _signInWithGoogle,
                   icon: Image.asset('assets/google/google.png', height: 24),
-                  label: const Text("Sign up with Google"),
+                  label: const Text("Sign in with Google"),
                   style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
                     side: const BorderSide(color: Colors.white),
+                    backgroundColor: Colors.white,
                   ),
                 ),
               ),

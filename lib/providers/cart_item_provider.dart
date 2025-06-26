@@ -61,36 +61,36 @@ class CartQuantityController extends AsyncNotifier<Map<String, int>> {
 }
 
 final cartQuantityControllerProvider = AsyncNotifierProvider<CartQuantityController, Map<String, int>>(
-      CartQuantityController.new,
-    );
+  CartQuantityController.new,
+);
 
 final cartItemServiceProvider = Provider<CartItemService>((ref) {
   return CartItemServiceImpl();
 });
 
 final addCartItemProvider = FutureProvider.family<void, CartItem>((
-  ref,
-  cartItem,
-) async {
+    ref,
+    cartItem,
+    ) async {
   final service = ref.read(cartItemServiceProvider);
   await service.addCartItem(cartItem);
   ref.invalidate(getCartItemByUserIdProvider);
 });
 
 final getCartItemByUserIdProvider = StreamProvider.family<List<CartItem>, String>((ref, userId) {
-      final service = ref.watch(cartItemServiceProvider);
-      return service.getCartItemByUserId(userId);
-    });
+  final service = ref.watch(cartItemServiceProvider);
+  return service.getCartItemByUserId(userId);
+});
 
 final selectedCartProvider =
-    StateNotifierProvider<SelectedCartNotifier, Set<String>>(
+StateNotifierProvider<SelectedCartNotifier, Set<String>>(
       (ref) => SelectedCartNotifier(),
-    );
+);
 
 final selectedItemsTotalProvider = Provider.family<double, List<CartItem>>((
-  ref,
-  cartItems,
-) {
+    ref,
+    cartItems,
+    ) {
   final selectedIds = ref.watch(selectedCartProvider);
   return cartItems
       .where((item) => selectedIds.contains(item.id))
@@ -98,9 +98,9 @@ final selectedItemsTotalProvider = Provider.family<double, List<CartItem>>((
 });
 
 final deleteCartItemProvider = FutureProvider.family<void, String>((
-  ref,
-  cartItemId,
-) async {
+    ref,
+    cartItemId,
+    ) async {
   final service = ref.read(cartItemServiceProvider);
   await service.deleteCartItem(cartItemId);
   ref.invalidate(getCartItemByUserIdProvider);
@@ -121,4 +121,3 @@ final getCheckedCartItemsProvider = StreamProvider.family<CartItem?, String>((re
   final service = ref.read(cartItemServiceProvider);
   return service.getCheckedCartItemsByCartItemId(cartItemId);
 });
-
