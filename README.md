@@ -34,15 +34,6 @@ The project uses **Firebase** as backend, **Riverpod** and **Provider** for stat
 - **REST API Integration**
 - **Git** for version control
 
-## 📸 Screenshots
-
-*(Add screenshots here if you have them! Example:)*
-
-```
-![Home Screen](screenshots/home.png)
-![Product Detail](screenshots/detail.png)
-```
-
 ## 📂 Getting Started
 
 To run this project locally:
