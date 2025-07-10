@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoes_store_app/screeen/product_detail_screen.dart';
 import 'package:shoes_store_app/screeen/profile_screen.dart';
+import 'package:shoes_store_app/screeen/see_all_product_screen.dart';
 import 'package:shoes_store_app/screeen/shopping_cart_screen.dart';
 
 import '../providers/home_provider.dart';
@@ -113,6 +114,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  void _showSeeAllProduct(){
+    try {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SeeAllProduct(
+                (String productId) {
+              // Handle product tap from SeeAllProduct screen
+              try {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductDetailScreen(productId),
+                  ),
+                );
+              } catch (e) {
+                _showErrorSnackBar('Could not open product details');
+              }
+            },
+          ),
+        ),
+      );
+    } catch (e) {
+      _showErrorSnackBar('Could not open products page');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final selectedIndex = ref.watch(homeIndexProvider);
@@ -158,9 +186,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {
-                        // Handle see all popular
-                      },
+                      onPressed: _showSeeAllProduct,
                       child: const Text('See all'),
                     ),
                   ],

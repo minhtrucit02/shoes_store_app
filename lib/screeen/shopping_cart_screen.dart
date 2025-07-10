@@ -50,22 +50,28 @@ class ShoppingCartScreen extends ConsumerWidget {
                   children: [
                     Checkbox(
                       value:
-                          cartItem.isNotEmpty &&
+                      cartItem.isNotEmpty &&
                           selectedItems.length == cartItem.length,
                       onChanged: (_) async {
                         if (selectedItems.length == cartItem.length) {
                           selectedNotifier.clear();
                           for (var item in cartItem) {
-                            await ref
-                                .read(changeCartStatusProvider((item.id, CartItemStatus.unpaid))
-                                .future);
+                            await ref.read(
+                              changeCartStatusProvider((
+                              item.id,
+                              CartItemStatus.unpaid,
+                              )).future,
+                            );
                           }
                         } else {
                           selectedNotifier.selectAll(cartItem);
                           for (var item in cartItem) {
-                            await ref
-                                .read(changeCartStatusProvider((item.id, CartItemStatus.checked))
-                                .future);
+                            await ref.read(
+                              changeCartStatusProvider((
+                              item.id,
+                              CartItemStatus.checked,
+                              )).future,
+                            );
                           }
                         }
                       },
@@ -103,14 +109,22 @@ class ShoppingCartScreen extends ConsumerWidget {
                             //TODO: checkbox product
                             Checkbox(
                               value: selectedItems.contains(item.id),
-                              onChanged: (bool? value) async{
+                              onChanged: (bool? value) async {
                                 if (value == true) {
                                   selectedNotifier.add(item.id);
-                                  await ref.read(changeCartStatusProvider((item.id,CartItemStatus.checked)).future);
+                                  await ref.read(
+                                    changeCartStatusProvider((
+                                    item.id,
+                                    CartItemStatus.checked,
+                                    )).future,
+                                  );
                                 } else {
                                   selectedNotifier.remove(item.id);
                                   await ref.read(
-                                    changeCartStatusProvider((item.id, CartItemStatus.unpaid)).future,
+                                    changeCartStatusProvider((
+                                    item.id,
+                                    CartItemStatus.unpaid,
+                                    )).future,
                                   );
                                 }
                               },
@@ -169,14 +183,14 @@ class ShoppingCartScreen extends ConsumerWidget {
                                           if (item.quantity > 1) {
                                             ref
                                                 .read(
-                                                  cartQuantityControllerProvider
-                                                      .notifier,
-                                                )
+                                              cartQuantityControllerProvider
+                                                  .notifier,
+                                            )
                                                 .updateQuantity(
-                                                  cartId: item.id,
-                                                  newQuantity:
-                                                      item.quantity - 1,
-                                                );
+                                              cartId: item.id,
+                                              newQuantity:
+                                              item.quantity - 1,
+                                            );
                                           }
                                         },
                                         child: Container(
@@ -209,13 +223,13 @@ class ShoppingCartScreen extends ConsumerWidget {
                                         onTap: () {
                                           ref
                                               .read(
-                                                cartQuantityControllerProvider
-                                                    .notifier,
-                                              )
+                                            cartQuantityControllerProvider
+                                                .notifier,
+                                          )
                                               .updateQuantity(
-                                                cartId: item.id,
-                                                newQuantity: item.quantity + 1,
-                                              );
+                                            cartId: item.id,
+                                            newQuantity: item.quantity + 1,
+                                          );
                                         },
                                         child: Container(
                                           padding: const EdgeInsets.all(4),
@@ -324,18 +338,21 @@ class ShoppingCartScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(15),
                         ),
                       ),
-                      onPressed:
-                          ref.watch(selectedCartProvider).isEmpty
-                              ? null
-                              : () {
-                        final totalPrice = ref.watch(selectedItemsTotalProvider(cartItem));
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PaymentScreen(totalAmount:totalPrice),
-                                  ),
-                                );
-                              },
+                      onPressed: selectedItems.isEmpty
+                          ? null
+                          : () {
+                        final totalPrice = ref.watch(
+                          selectedItemsTotalProvider(cartItem),
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PaymentScreen(
+                              totalAmount: totalPrice,
+                            ),
+                          ),
+                        );
+                      },
                       child: const Text(
                         'Checkout',
                         style: TextStyle(color: Colors.white, fontSize: 16),
@@ -348,7 +365,7 @@ class ShoppingCartScreen extends ConsumerWidget {
           );
         },
         error: (e, _) => Center(child: Text('Have error: $e')),
-        loading: () => Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );
   }

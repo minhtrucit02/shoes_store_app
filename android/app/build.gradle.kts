@@ -11,7 +11,7 @@ plugins {
 }
 
 android {
-    namespace = "com.minhtruc.shoes_store_app"
+    namespace = "com.shoestore.template"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -25,7 +25,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.minhtruc.shoes_store_app"
+        applicationId = "com.shoestore.template"
         minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

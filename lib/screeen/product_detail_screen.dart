@@ -175,7 +175,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                   // Price
                                   const SizedBox(height: 8),
                                   Text(
-                                    '\$${product.price.toStringAsFixed(2)}',
+                                    '\$${product.price.toStringAsFixed(0)}',
                                     style: const TextStyle(
                                       color: Color(0xFF4A90E2),
                                       fontSize: 20,
@@ -386,7 +386,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '\$${product.price.toStringAsFixed(2)}',
+                                  '\$${product.price.toStringAsFixed(0)}',
                                   style: const TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.w700,

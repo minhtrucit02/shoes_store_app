@@ -124,6 +124,43 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:204991613682:android:386f0b4967314990359e6b",
+        "android_client_info": {
+          "package_name": "com.shoestore.template"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "204991613682-ar5fd3shjupk9ah3b9klsqa4jc0j3i0p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.shoestore.template",
+            "certificate_hash": "882da27d3425e93f880c7355248a5772fa0c2f65"
+          }
+        },
+        {
+          "client_id": "204991613682-eeovkmosgai6otvp23t9l8d9mm5io7ls.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9zda2-gApf3BnmmcrbVXwxzdG5Nnx9_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "204991613682-eeovkmosgai6otvp23t9l8d9mm5io7ls.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"
